@@ -1,12 +1,12 @@
 import tn_julia: ctm, cpscollapse, cps_z, normalise, mpo_expectation, heisenbergmpo
 using Plots
 
-L = 10
+L = 50
 S = 1
-beta = 20
+beta = 1
 steps = 10
 ensemble_size = 20
-Nkeep = 8
+Nkeep = 10
 
 # initialise energy array for Sz Sx 
 E_zx = zeros(steps)
