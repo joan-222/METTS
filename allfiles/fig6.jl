@@ -1,11 +1,12 @@
 import tn_julia: ctm, cpscollapse, cps_z, normalise, mpo_expectation, heisenbergmpo
 using Plots
 
-L = 30
+L = 10
 S = 1
-beta = 1
+beta = 20
 steps = 10
-ensemble_size = 10
+ensemble_size = 20
+Nkeep = 8
 
 # initialise energy array for Sz Sx 
 E_zx = zeros(steps)
@@ -20,7 +21,7 @@ for j in 1:ensemble_size
 
     # iteration for Sz Sx
     for i in 1:steps
-        metts = ctm(c, beta, 10)
+        metts = ctm(c, beta, Nkeep)
 
         # measure energy E for metts generated here
         E = mpo_expectation(heisenbergmpo(L, 1.0), copy(metts))
@@ -39,7 +40,7 @@ for j in 1:ensemble_size
 
     # iteration for Sz
     for i in 1:steps
-        metts = ctm(cz, beta, 10)
+        metts = ctm(cz, beta, Nkeep)
 
         # measure energy E for metts generated here
         Ez = mpo_expectation(heisenbergmpo(L, 1.0), copy(metts))
