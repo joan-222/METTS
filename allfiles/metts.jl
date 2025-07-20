@@ -19,15 +19,13 @@ function ctm(psi_i, beta, Nkeep)
     mnew = tdmrg(psi_i, beta/2, 2000, Nkeep)
 
     # calculating P(i)
-    # P_i = norm(mnew) #^2
-
     Id = P_mpo(reshape(LinearAlgebra.I(3), 1, 3, 1, 3), L, 1)
 
-    P = expectationvalue(mnew, Id, mnew)  
+    P = mpo_expectation(Id, mnew)
     P = P[1]
 
     # calculating metts = P_i^(-1/2) * e^(- beta H / 2) psi_i
-    metts = (P_i)^(-1/2) * mnew
+    metts = (P)^(-1/2) * mnew
     return metts
 end
 
@@ -221,18 +219,6 @@ function heisenbergmpo(L::Int, J::Float64 = 1.0)
     return mpo
 end
 
-function expectationvalue(
-    mps::AbstractVector{<:AbstractArray{<:Number, 3}},
-    mpo::AbstractVector{<:AbstractArray{<:Number, 4}},
-    mps2::AbstractVector{<:AbstractArray{<:Number, 3}}=mps
-)
-    expval = ones(ComplexF64, 1, 1, 1)
-    for (M, W, M2) in zip(mps, mpo, mps2)
-        expval = updateLeft(expval, M2, W, M)
-    end
-    return expval
-end
-
 function mpo_expectation(W::Vector{<:AbstractArray{<:Number,4}}, 
                          MPS::Vector{<:AbstractArray{<:Number,3}})
     # Initialize environment as scalar identity in a 3-leg tensor form
@@ -246,21 +232,9 @@ function mpo_expectation(W::Vector{<:AbstractArray{<:Number,4}},
     return real(C[1,1,1])
 end
 
-# function normalise(mps)
-#     L = size(mps, 1)
-#     Id = P_mpo(reshape(LinearAlgebra.I(3), 1, 3, 1, 3), L, 1)
-
-#     nm = mpo_expectation(Id, mps)
-#     nm = nm[1]
-
-#     mps_normalised = (nm^(-1/2)) * mps
-
-#     return mps_normalised
-# end
-
 function normalise(mps)
     L = length(mps)
-    Id = P_mpo(reshape(LinearAlgebra.I(3), 1, 3, 1, 3), L, 2)
+    Id = P_mpo(reshape(LinearAlgebra.I(3), 1, 3, 1, 3), L, 1)
     norm = mpo_expectation(Id, mps)
     mps[1] = mps[1] / sqrt(norm)
     return mps
